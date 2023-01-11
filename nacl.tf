@@ -33,7 +33,14 @@ resource "aws_network_acl" "app" {
   }
 }
 
+resource "null_resource" "sleep" {
+  provisioner "local-exec" {
+    command = "sleep 60"
+  }
+}
+
 resource "aws_network_acl_association" "app" {
+  depends_on     = [null_resource.sleep]
   count          = length(aws_subnet.app_subnets.*.id)
   network_acl_id = aws_network_acl.app.id
   subnet_id      = element(aws_subnet.app_subnets.*.id, count.index)
